@@ -1,0 +1,31 @@
+
+html {
+  font-family: Helvetica, Verdana, Arial, sans-serif;
+}
+#container {
+  width: 700px;
+  margin: 10px auto;
+}
+.game-container {
+  width: 700px;
+  height: 650px;
+}
+.canvas {
+  position: relative;
+}
+.coin {
+  width: 90px;
+  height: 90px;
+  border-radius: 45px;
+  margin: 5px;
+}
+.coin.player-1 {
+  background: blue;
+}
+.coin.player-2 {
+  background: green;
+}
+.status  {
+  line-height: 50px;
+  text-align: center;
+}
