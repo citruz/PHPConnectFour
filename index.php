@@ -29,18 +29,18 @@ $userData = $loginData['user_obj'];
     <h1>Vier gewinnt!</h1>
 
     <div class="userarea">
-      <?php echo $userData['username'];?> | <a href="logout.php">Logout</a>
+      <?php echo $userData['username'];?> | <a href="view.php?action=logout">Logout</a>
     </div>
   </header>
 	<nav>
     <div class="nav-inner">
-      <div class="elem active"><a href="#" id="lobby">Lobby</a></div>
+      <div class="elem active"><a href="#" class="lobby">Lobby</a></div>
     </div>
     <div class="clear"></div>
   </nav>
 	<div class="content">
     <div id="mainmenu">
-      <form method="post" action="creategame.php" class="creategame">
+      <form method="post" action="view.php?action=creategame" class="creategame">
         <input name="name" type="text" placeholder="Spielname"/>
         <input type="submit" value="Erstellen" />
       </form>

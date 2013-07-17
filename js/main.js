@@ -1,13 +1,14 @@
 var currentGames = {};
 var currentGameId;
 
+
 $(document).ready(function(){
   getGames();
   getUserGames();
   $(".gameslist, nav").on("click", "a", function(event){
     if ($(this).data('id') != undefined) 
       switchTo($(this).data('id'));
-    else {
+    else if ($(this).hasClass('lobby')) {
       //Show lobby
       $('.game-container').hide();
       $('#mainmenu').show();
@@ -28,7 +29,7 @@ $(document).ready(function(){
   $('form.creategame').ajaxForm(
   {
      success: function(response, statusString, xhr, $form){
-        getGameData(response, function() {switchTo2();});
+        getGameData(response, function(gameid) {switchTo2(gameid);});
     },
     error: function(response, status, err){
       errorOut(response);
@@ -40,7 +41,7 @@ $(document).ready(function(){
 function switchTo(gameid) {
   if (currentGames[gameid] === undefined) {
     //join game
-    $.getJSON('join.php', {'gameid': gameid}, function(data) {
+    $.getJSON('view.php?action=join', {'gameid': gameid}, function(data) {
       if (data.error) {
         error(data.msg);
       } else {
@@ -62,9 +63,10 @@ function switchTo(gameid) {
 function switchTo2(gameid) {
   $('#mainmenu').hide();
   $('.game-container').hide();
-
+   
   if ($('#container-'+gameid).length == 0) {
     $('.content').append('<div class="game-container" id="container-'+gameid+'"></div>');
+    
     initGameCanvas(gameid);
   } else {
     $('#container-'+gameid).show();
@@ -72,8 +74,12 @@ function switchTo2(gameid) {
   $('nav .elem').removeClass('active');
   $('nav a[data-id='+gameid+']').parent().addClass('active');
   currentGameId = gameid;
-  updateCurrentGame();
-  setInterval(function(){updateCurrentGame();},1000);
+  getGameData(gameid, function(){$('nav a[data-id='+gameid+']').parent().addClass('active');});
+
+  setInterval(function(){
+    
+    updateCurrentGame();
+  },1000);
 }
 
 function updateCurrentGame() {
@@ -102,7 +108,7 @@ function initGameCanvas(gameid) {
 
 function columnClicked(colNum) {
   if (isValidColumn(colNum)) {
-    $.getJSON('submitmove.php?gameid='+currentGameId+'&x='+colNum, function(data) { 
+    $.getJSON('view.php?action=submitmove&gameid='+currentGameId+'&x='+colNum, function(data) { 
       if (data.error == undefined) {
         currentGames[currentGameId].moves = data.moves;
         paintCoins(currentGameId);
@@ -122,7 +128,7 @@ function updateState(gameid) {
   if (currentGames[gameid].minId == undefined)
     currentGames[gameid].minId = 0;
 
-  $.getJSON('getgamestate.php?gameid='+gameid+'&minId='+currentGames[gameid].minId, function(data) { 
+  $.getJSON('view.php?action=getgamestate&gameid='+gameid+'&minId='+currentGames[gameid].minId, function(data) { 
     if (data.error == undefined) {
       currentGames[currentGameId] = data;
       paintCoins(gameid);
@@ -158,7 +164,7 @@ function switchPlayers(gameid) {
 }
 
 function getUserGames() {
-   $.getJSON('getgames.php?scope=user', function(data) { 
+   $.getJSON('view.php?action=getgames&scope=user', function(data) { 
       if (data.error == undefined) {
         currentGames.game = data;
         $.each(data, function(key, game) {
@@ -177,15 +183,15 @@ function getUserGames() {
 }
 
 function getGameData(gameid, callback) {
-    $.getJSON('getgameinfo.php', {'gameid': gameid}, function(data) {
+    $.getJSON('view.php?action=getgameinfo', {'gameid': gameid}, function(data) {
       if (data.error == undefined) {
         if (currentGames[gameid] == undefined)
           currentGames[gameid] = {};
 
         currentGames[gameid].game = data;
-        if ($('a[data-id='+gameid+']').length == 0)
+        if ($('nav a[data-id='+gameid+']').length == 0)
           $("nav .nav-inner").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
-        callback();
+        callback(gameid);
       } else {
         errorOut(data.msg);
       }
@@ -195,7 +201,7 @@ function getGameData(gameid, callback) {
 }
 
 function getGames() {
-  $.getJSON('getgames.php', function(data) {
+  $.getJSON('view.php?action=getgames', function(data) {
     var items = [];
 
     $.each(data, function(key, game) {
