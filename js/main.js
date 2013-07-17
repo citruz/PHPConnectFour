@@ -11,6 +11,17 @@ $(document).ready(function(){
     event.preventDefault();
     return false;
   });
+
+  $('form.creategame').ajaxForm(
+  {
+     success: function(response, statusString, xhr, $form){
+        getGameData(response, function() {switchTo2();});
+    },
+    error: function(response, status, err){
+      errorOut(response);
+    }
+  }
+  ); 
 });
 
 function switchTo(gameid) {
@@ -20,8 +31,9 @@ function switchTo(gameid) {
       if (data.error) {
         error(data.msg);
       } else {
+        currentGames[gameid] = data;
         currentGames[gameid].minId = 0;
-        getGameData(gameid, function() {switchTo2();});
+        switchTo2(gameid);
       }
     })
     .fail(function(jqxhr, textStatus, error) { 
@@ -41,20 +53,24 @@ function switchTo2(gameid) {
   if ($('#container-'+gameid).length == 0) {
     $('.content').append('<div class="game-container" id="container-'+gameid+'"></div>');
     initGameCanvas(gameid);
-    updateState(gameid);
   } else {
     $('#container-'+gameid).show();
   }
   currentGameId = gameid;
+  updateCurrentGame();
+  setInterval(function(){updateCurrentGame();},1000);
+}
+
+function updateCurrentGame() {
+  updateState(currentGameId);
 }
 
 function initGameCanvas(gameid) {
   var cont = $('#container-'+gameid);
 
   cont.css('background', '#EEE');
-  cont.append('<div class="status" style="height: 50px; border-bottom: 1px solid black;" ><span>Spieler 1 ist am Zug!</span></div>');
 
-  cont.append('<div class="canvas" />');
+  cont.append('<div class="status"><span></span></div><div class="canvas"></div>');
   var canvas = cont.find('.canvas');
   canvas.css('width', '100%');
   canvas.css('height',  cont.height() - 50 + "px");
@@ -74,9 +90,8 @@ function columnClicked(colNum) {
   if (isValidColumn(colNum)) {
     $.getJSON('submitmove.php?gameid='+currentGameId+'&x='+colNum, function(data) { 
       if (data.error == undefined) {
-        $.each(data, function(key, arr) {
-          //TODO
-        });
+        currentGames[currentGameId].moves = data.moves;
+        paintCoins(currentGameId);
       } else {
         errorOut(data.msg);
       }
@@ -90,17 +105,14 @@ function isValidColumn(colNum) {
 }
 
 function updateState(gameid) {
-  console.log(currentGames[gameid]);
   if (currentGames[gameid].minId == undefined)
     currentGames[gameid].minId = 0;
 
   $.getJSON('getgamestate.php?gameid='+gameid+'&minId='+currentGames[gameid].minId, function(data) { 
     if (data.error == undefined) {
-      $.each(data, function(key, arr) {
-        currentGames[gameid] = arr;
-        paintCoins(gameid);
-        switchPlayers(gameid);
-      });
+      currentGames[currentGameId] = data;
+      paintCoins(gameid);
+      switchPlayers(gameid);
     } else {
       errorOut(data.msg);
     }
@@ -113,14 +125,22 @@ function paintCoins(gameid) {
   $('#container-'+gameid+' .canvas').html('');
   if (currentGames[gameid].moves != undefined) {
     $.each(currentGames[gameid].moves, function(key, move) { 
-      var playerNum = (move.playerid == currentGames[gameid].players[0].id) ? 0 : 1;
+      var playerNum = (move.userid == currentGames[gameid].game.players[0].id) ? 0 : 1;
       $('#container-'+gameid+' .canvas').append(
-        '<div class="coin new player-'+this.curPlayer+'" style="opacity: 1;" />'
+        '<div class="coin new player-'+playerNum+'" style="opacity: 1; position: absolute; top: '+((move.y-1)*100)+'px; left: '+((move.x-1)*100)+'px" />'
       );
     }); 
 } }
 function switchPlayers(gameid) {
-
+  if (currentGames[gameid].game.players == undefined || currentGames[gameid].game.players.length == 1) {
+    $('#container-'+gameid+' .status span').html('Warte auf zweiten Spieler.');
+  } else {
+    $.each(currentGames[gameid].game.players, function(key, player) {
+      if (player.id == currentGames[gameid].currentPlayer) {
+        $('#container-'+gameid+' .status span').html('Spieler ' + player.username + ' ist am Zug!');
+      }
+    });
+  }
 }
 
 function getUserGames() {
@@ -133,7 +153,7 @@ function getUserGames() {
 
           currentGames[game.id].game=game;
           if ($('a[data-id='+game.id+']').length == 0)
-            $("nav").append('<a href="#" data-id="'+game.id+'">'+game.name+'</a>');
+            $("nav").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+game.id+'">'+game.name+'</a></div>');
         });
       } else {
         errorOut(data.msg);
@@ -144,10 +164,17 @@ function getUserGames() {
 
 function getGameData(gameid, callback) {
     $.getJSON('getgameinfo.php', {'gameid': gameid}, function(data) {
-      currentGames[gameid].game = data;
-      if ($('a[data-id='+gameid+']').length == 0)
-        $("nav").append('<a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a>');
-      callback();
+      if (data.error == undefined) {
+        if (currentGames[gameid] == undefined)
+          currentGames[gameid] = {};
+
+        currentGames[gameid].game = data;
+        if ($('a[data-id='+gameid+']').length == 0)
+          $("nav").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
+        callback();
+      } else {
+        errorOut(data.msg);
+      }
     })    
     .fail(function(jqxhr, textStatus, error) { errorOut("Error getting game data.",jqxhr); });
 
@@ -168,10 +195,10 @@ function getGames() {
 }
 
 function errorOut(msg) {
-  alert(msg);
+  alert("fehler: "+msg);
 }
 function errorOut(msg, jqxhr) {
-  alert(msg);
+  alert("fehler: "+msg);
   console.log(jqxhr);
 }
 

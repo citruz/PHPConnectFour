@@ -2,9 +2,43 @@
 html {
   font-family: Helvetica, Verdana, Arial, sans-serif;
 }
-#container {
+.wrapper {
   width: 700px;
   margin: 10px auto;
+}
+header {
+  height: 100px;
+  position: relative;
+}
+.userarea {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: 200px;
+  text-align: right;
+}
+nav .elem {
+  display: block;
+  float: left;
+  padding: 5px;
+  background: grey;
+  position: relative;
+}
+nav .elem a[data-id] {
+  padding-left: 20px;
+}
+nav .elem a.close {
+  position: absolute;
+  display: block;
+  width: 10px;
+  height: 10px;
+  background: red;
+  text-indent: -999px;
+  top: 10px;
+  left: 10px;
+}
+.content {
+  margin-top: 20px;
 }
 .game-container {
   width: 700px;
@@ -22,10 +56,13 @@ html {
 .coin.player-1 {
   background: blue;
 }
-.coin.player-2 {
+.coin.player-0 {
   background: green;
 }
 .status  {
   line-height: 50px;
   text-align: center;
+}
+.clear {
+  clear: both;
 }

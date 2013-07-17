@@ -96,8 +96,8 @@ class Controller {
 
   public function createGame($args) {
     if ($this->user != null) {
-      $name = $args['name'];
-      if (isset($name) && trim($args['name']) != "") {
+      if (isset($args['name']) && trim($args['name']) != "") {
+        $name = $args['name'];
         $ret = $this->model->createGame($args['name'], 2);
         if (!is_array($ret)) {
           //Game created
@@ -116,6 +116,8 @@ class Controller {
       } else {
         return array('error' => 'Ungültiger Name');
       }
+    } else {
+        return array('error' => 'Nicht authentifiziert.');
     }
   }
 
@@ -125,7 +127,7 @@ class Controller {
     } else {
       $game = $this->model->getGame($args['gameid']);
       if ($game == null || isset($game['error'])) {
-        return array('error' => 'true', 'msg' => 'Ungültige Gameid gegeben.');
+        return array('error' => 'true', 'msg' => 'Ungültige Gameid gegeben: "'.$args['gameid'].'".');
       } else if ($game['closed'] == 1) {
         return array('error' => 'true', 'msg' => 'Spiel ist schon beendet.');
       } else {
@@ -141,7 +143,7 @@ class Controller {
     } else {
       $game = $this->model->getGame($args['gameid']);
       if ($game == null || isset($game['error'])) {
-        return array('error' => 'true', 'msg' => 'Ungültige Gameid gegeben.');
+        return array('error' => 'true', 'msg' => 'Ungültige Gameid gegeben "'.$args['gameid'].'".');
       } 
       $players = $this->model->getUsersForGame($game['id']);
 

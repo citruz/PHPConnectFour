@@ -11,8 +11,8 @@ if ($loginData['loggedin'] == false)
 
 $ret = $controller->createGame($_POST);
 
-if ($ret === true) {
-  die('success');
+if (!is_array($ret)) {
+  die("".$ret);
 } else {
   http_response_code(400);
   die(json_encode($ret));

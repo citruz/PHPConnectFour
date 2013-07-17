@@ -19,7 +19,8 @@ $userData = $loginData['user_obj'];
 	<link rel="stylesheet" type="text/css" href="css/style.css">
 
 	<script type="text/javascript" src="js/jquery-1.10.2.min.js"></script>
-	<script type="text/javascript" src="js/main.js">></script>
+  <script type="text/javascript" src="js/jquery.form.min.js">></script>
+  <script type="text/javascript" src="js/main.js">></script>
 
 </head>
 <body>
@@ -31,11 +32,12 @@ $userData = $loginData['user_obj'];
       <?php echo $userData['username'];?> | <a href="logout.php">Logout</a>
     </div>
   </header>
-	<nav><a href="#">Lobby</a></nav>
+	<nav><div class="elem"><a href="#" id="lobby">Lobby</a></div></nav>
+  <div class="clear"></div>
 
 	<div class="content">
     <div id="mainmenu">
-      <form method="post" action="creategame.php">
+      <form method="post" action="creategame.php" class="creategame">
         <input name="name" type="text" />
         <input type="submit" value="Erstellen" />
       </form>
