@@ -59,13 +59,18 @@ class Controller {
       //Login Successful
       $this->user = $user;
       $this->model->createSession($user['id'], session_id());
-      header("Location: ".self::$mainPage);
+
+      $ref =  (isset($args['ref'])) ? $args['ref'] :  self::$mainPage;
+
+      header("Location: ".$ref);
       die();
     } else {
-      return "Ungültige Login-Daten.";
+      header("Location: ".$ref."?msg=".urlencode("Ungültige Login-Daten."));
     }
 
   }
+
+  
 
   public function logout() {
     if (($err = $this->model->removeSession($this->user['userid'], session_id())) === true) {

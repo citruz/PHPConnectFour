@@ -7,6 +7,12 @@ $(document).ready(function(){
   $(".gameslist, nav").on("click", "a", function(event){
     if ($(this).data('id') != undefined) 
       switchTo($(this).data('id'));
+    else {
+      $('.game-container').hide();
+      $('#mainmenu').show();
+      $('nav .elem').removeClass('active');
+      $('nav .elem:first').addClass('active');
+    }
 
     event.preventDefault();
     return false;
@@ -56,6 +62,8 @@ function switchTo2(gameid) {
   } else {
     $('#container-'+gameid).show();
   }
+  $('nav .elem').removeClass('active');
+  $('nav a[data-id='+gameid+']').parent().addClass('active');
   currentGameId = gameid;
   updateCurrentGame();
   setInterval(function(){updateCurrentGame();},1000);
@@ -68,7 +76,6 @@ function updateCurrentGame() {
 function initGameCanvas(gameid) {
   var cont = $('#container-'+gameid);
 
-  cont.css('background', '#EEE');
 
   cont.append('<div class="status"><span></span></div><div class="canvas"></div>');
   var canvas = cont.find('.canvas');
@@ -153,7 +160,7 @@ function getUserGames() {
 
           currentGames[game.id].game=game;
           if ($('a[data-id='+game.id+']').length == 0)
-            $("nav").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+game.id+'">'+game.name+'</a></div>');
+            $("nav .nav-inner").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+game.id+'">'+game.name+'</a></div>');
         });
       } else {
         errorOut(data.msg);
@@ -170,7 +177,7 @@ function getGameData(gameid, callback) {
 
         currentGames[gameid].game = data;
         if ($('a[data-id='+gameid+']').length == 0)
-          $("nav").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
+          $("nav .nav-inner").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
         callback();
       } else {
         errorOut(data.msg);

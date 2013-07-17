@@ -32,13 +32,16 @@ $userData = $loginData['user_obj'];
       <?php echo $userData['username'];?> | <a href="logout.php">Logout</a>
     </div>
   </header>
-	<nav><div class="elem"><a href="#" id="lobby">Lobby</a></div></nav>
-  <div class="clear"></div>
-
+	<nav>
+    <div class="nav-inner">
+      <div class="elem active"><a href="#" id="lobby">Lobby</a></div>
+    </div>
+    <div class="clear"></div>
+  </nav>
 	<div class="content">
     <div id="mainmenu">
       <form method="post" action="creategame.php" class="creategame">
-        <input name="name" type="text" />
+        <input name="name" type="text" placeholder="Spielname"/>
         <input type="submit" value="Erstellen" />
       </form>
       <div class="gameslist"></div>
