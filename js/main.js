@@ -8,14 +8,20 @@ $(document).ready(function(){
     if ($(this).data('id') != undefined) 
       switchTo($(this).data('id'));
     else {
+      //Show lobby
       $('.game-container').hide();
       $('#mainmenu').show();
       $('nav .elem').removeClass('active');
       $('nav .elem:first').addClass('active');
+      getGames();
     }
 
     event.preventDefault();
     return false;
+  });
+
+  $('.gameslist a.refresh').click(function() {
+    getGames();
   });
 
   $('form.creategame').ajaxForm(

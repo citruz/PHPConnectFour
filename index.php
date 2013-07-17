@@ -44,6 +44,7 @@ $userData = $loginData['user_obj'];
         <input name="name" type="text" placeholder="Spielname"/>
         <input type="submit" value="Erstellen" />
       </form>
+      <a href="#" class="refresh">Refresh</a>
       <div class="gameslist"></div>
     </div>
 	</div>
