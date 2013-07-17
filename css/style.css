@@ -64,6 +64,7 @@ filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', end
 nav .elem a {
   text-decoration: none;
   color: black;
+  text-shadow: 0px -2px 0px rgba(255, 255, 255, 1)
 }
 nav .elem.active {
   text-decoration: none;
@@ -92,11 +93,19 @@ nav .elem a.close {
   text-indent: -999px;
   top: 8px;
   left: 10px;
+  opacity: 0.7;
+}
+nav .elem a.close:hover {
+  opacity: 1;
 }
 .content {
   padding-top: 20px;
   background: white;
   min-height: 650px;
+}
+.gameslist li span {
+  font-size: small;
+  color: #999;
 }
 .game-container {
   width: 700px;

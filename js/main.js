@@ -20,8 +20,9 @@ $(document).ready(function(){
     return false;
   });
 
-  $('.gameslist a.refresh').click(function() {
+  $(' .refresh').click(function(e) {
     getGames();
+    e.preventDefault();
   });
 
   $('form.creategame').ajaxForm(
@@ -198,12 +199,12 @@ function getGames() {
     var items = [];
 
     $.each(data, function(key, game) {
-      items.push('<li><a href="#" data-id="'+game.id+'">' + game.name + '</a></li>');
+      items.push('<li><a href="#" data-id="'+game.id+'">' + game.name + '</a><span>  (gestartet von '+game.username+')</span></li>');
     });
    $('<ul/>', {
-      'class': 'my-new-list',
+      'class': 'gameslist',
       html: items.join('')
-    }).appendTo('.gameslist');
+    }).appendTo($('.gameslist').empty());
     });
 }
 
