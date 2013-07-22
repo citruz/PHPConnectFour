@@ -4,11 +4,14 @@ var currentGameId;
 
 $(document).ready(function(){
   getGames();
+  setInterval("getGames()", 5000);
   getUserGames();
   $(".gameslist, nav").on("click", "a", function(event){
-    if ($(this).data('id') != undefined) 
+    if ($(this).hasClass('close')) {
+      leaveGame($(this).data('id'));
+    } else if ($(this).data('id') != undefined) { 
       switchTo($(this).data('id'));
-    else if ($(this).hasClass('lobby')) {
+    } else if ($(this).hasClass('lobby')) {
       //Show lobby
       $('.game-container').hide();
       $('#mainmenu').show();
@@ -21,14 +24,64 @@ $(document).ready(function(){
     return false;
   });
 
-  $(' .refresh').click(function(e) {
+  $('.refresh').click(function(e) {
     getGames();
+    e.preventDefault();
+  });
+  $(' .new').click(function(e) {
+    //reset values
+    $('.rightCol input[type=text]').val('');
+    $('.rightCol .colorPicker a.active').removeClass('active');
+    $('.rightCol').fadeIn();
+    e.preventDefault();
+  });
+  $(' .rightCol .close').click(function(e) {
+    $('.rightCol').fadeOut();
     e.preventDefault();
   });
 
   $('form.creategame').ajaxForm(
   {
-     success: function(response, statusString, xhr, $form){
+    beforeSubmit: function(formData, jqForm, options) {
+      $('form.creategame .error').removeClass('error');
+
+      var error = false;
+      if (formData[0].value.replace(' ','').length == 0) {
+        //Kein Name eingegeben
+        $('form.creategame input[type=text]').addClass('error');
+        error = true;
+      }
+
+      var p1Color = $('#p1color a.active');
+      if (p1Color.length == 0) {
+        //Keine Farbe1 eingegeben
+        $('#p1color').addClass('error');
+        error = true;
+      }
+      var p2Color = $('#p2color a.active');
+      if (p2Color.length == 0) {
+        //Keine Farbe2 eingegeben
+        $('#p2color').addClass('error');
+        error = true;
+      }
+      if (p2Color.html() == p1Color.html()) {
+        //Gleiche farbe
+        $('#p2color, #p1color').addClass('error');
+        error = true;
+      }
+
+      if (error)
+        return false;
+      
+
+      $('.rightCol').fadeOut();
+
+      formData.push({name: "player1color", value: p1Color.html()});
+      formData.push({name: "player2color", value: p2Color.html()});
+      console.log(formData);
+      return true;
+    },
+    success: function(response, statusString, xhr, $form){
         getGameData(response, function(gameid) {switchTo2(gameid);});
     },
     error: function(response, status, err){
@@ -36,7 +89,38 @@ $(document).ready(function(){
     }
   }
   ); 
+
+
+  //Colorpicker
+  $(".colorPicker").on("click", "a", function(event){
+    $(this).parent().parent().find('a.active').removeClass('active');
+    $(this).addClass('active');
+    event.preventDefault();
+    return false;
+  });
 });
+
+function leaveGame(gameid) {
+  if (currentGames[gameid] != undefined) {
+    //leave game
+    $.getJSON('view.php?action=leave&gameid='+gameid, function(data) {
+      currentGames[gameid] = undefined;
+      $('nav .elem[data-id='+gameid+']').remove();
+      $('#container-'+gameid).remove();
+      if (currentGameId == gameid) {   
+        $('#mainmenu').show();
+        $('nav .elem').removeClass('active');
+        $('nav .elem:first').addClass('active'); 
+        currentGameId = undefined;
+      }
+    })
+    .fail(function(jqxhr, textStatus, error) { 
+      errorOut("Error leaving game.",jqxhr); 
+    });
+    
+  }
+}
+
 
 function switchTo(gameid) {
   if (currentGames[gameid] === undefined) {
@@ -76,14 +160,12 @@ function switchTo2(gameid) {
   currentGameId = gameid;
   getGameData(gameid, function(){$('nav a[data-id='+gameid+']').parent().addClass('active');});
 
-  setInterval(function(){
-    
-    updateCurrentGame();
-  },1000);
+  setInterval("updateCurrentGame()",1000);
 }
 
 function updateCurrentGame() {
-  updateState(currentGameId);
+  if (currentGameId != undefined)
+    updateState(currentGameId);
 }
 
 function initGameCanvas(gameid) {
@@ -96,6 +178,12 @@ function initGameCanvas(gameid) {
   canvas.css('height',  cont.height() - 50 + "px");
 
   cont.on('click', function(e){
+    if(typeof e.offsetX === "undefined" || typeof e.offsetY === "undefined") {
+       var targetOffset = $(e.target).offset();
+       e.offsetX = e.pageX - targetOffset.left;
+       e.offsetY = e.pageY - targetOffset.top;
+    }
+
     if (e.offsetY > 50) {
       //Determine clicked col
       var colWidth = cont.width() / 7;
@@ -131,8 +219,24 @@ function updateState(gameid) {
   $.getJSON('view.php?action=getgamestate&gameid='+gameid+'&minId='+currentGames[gameid].minId, function(data) { 
     if (data.error == undefined) {
       currentGames[currentGameId] = data;
-      paintCoins(gameid);
-      switchPlayers(gameid);
+      if (data.game.game.closed == "1" && data.game.game.haswinner == "0" ) {
+        //Spiel wurde beendet
+        $('#container-'+gameid+' .status span').html('Das Spiel wurde vorzeitig beendet, es gibt keinen Sieger.');
+      } else if (data.game.game.closed == "1" && data.game.game.haswinner == "1" ) {
+
+        var winnerName;
+        $.each(data.game.players, function(key, player) {
+          if (player.id == data.game.game.winner) {
+            winnerName = player.username;
+          }
+        });
+ 
+        $('#container-'+gameid+' .status span').html('Das Spiel ist beendet, '+winnerName+' ist der Sieger!');
+      } else {
+      
+        paintCoins(gameid);
+        switchPlayers(gameid);
+      }
     } else {
       errorOut(data.msg);
     }
@@ -146,8 +250,13 @@ function paintCoins(gameid) {
   if (currentGames[gameid].moves != undefined) {
     $.each(currentGames[gameid].moves, function(key, move) { 
       var playerNum = (move.userid == currentGames[gameid].game.players[0].id) ? 0 : 1;
+      if (playerNum == 0)
+        var color =  currentGames[gameid].game.game.player1color;
+      else 
+        var color =  currentGames[gameid].game.game.player2color;
+
       $('#container-'+gameid+' .canvas').append(
-        '<div class="coin new player-'+playerNum+'" style="opacity: 1; position: absolute; top: '+((move.y-1)*100)+'px; left: '+((move.x-1)*100)+'px" />'
+        '<div class="coin new player-'+playerNum+'" style="background: '+color+';opacity: 1; position: absolute; top: '+((move.y-1)*75)+'px; left: '+((move.x-1)*75)+'px" />'
       );
     }); 
 } }
@@ -173,7 +282,7 @@ function getUserGames() {
 
           currentGames[game.id].game=game;
           if ($('a[data-id='+game.id+']').length == 0)
-            $("nav .nav-inner").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+game.id+'">'+game.name+'</a></div>');
+            $("nav .nav-inner").append('<div class="elem" data-id="'+game.id+'" ><a class="close"  data-id="'+game.id+'" href="#">Close</a><a href="#" class="gamelink" data-id="'+game.id+'">'+game.name+'</a></div>');
         });
       } else {
         errorOut(data.msg);
@@ -190,7 +299,7 @@ function getGameData(gameid, callback) {
 
         currentGames[gameid].game = data;
         if ($('nav a[data-id='+gameid+']').length == 0)
-          $("nav .nav-inner").append('<div class="elem"><a class="close" href="#">Close</a><a href="#" data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
+          $("nav .nav-inner").append('<div class="elem" data-id="'+gameid+'"><a class="close" data-id="'+gameid+'" href="#">Close</a><a href="#" class="gamelink"  data-id="'+data.game.id+'">'+data.game.name+'</a></div>');
         callback(gameid);
       } else {
         errorOut(data.msg);
@@ -201,17 +310,23 @@ function getGameData(gameid, callback) {
 }
 
 function getGames() {
-  $.getJSON('view.php?action=getgames', function(data) {
-    var items = [];
+  if (currentGameId != undefined)
+    return;
 
-    $.each(data, function(key, game) {
-      items.push('<li><a href="#" data-id="'+game.id+'">' + game.name + '</a><span>  (gestartet von '+game.username+')</span></li>');
-    });
-   $('<ul/>', {
-      'class': 'gameslist',
-      html: items.join('')
-    }).appendTo($('.gameslist').empty());
-    });
+  $.getJSON('view.php?action=getgames', function(data) {
+    if (data.length != 0) {
+      var items = [];
+      $.each(data, function(key, game) {
+        items.push('<li><a href="#" data-id="'+game.id+'">' + game.name + '</a><span>  (gestartet von '+game.username+')</span></li>');
+      });
+     $('<ul/>', {
+        'class': 'gameslist',
+        html: items.join('')
+      }).appendTo($('.gameslist').empty());
+   } else {
+    $('.gameslist').html('<div class="empty">Es gibt zu Zeit keine offenen Partien. Sei der Erste!</div>');
+   }
+  });
 }
 
 function errorOut(msg) {
@@ -221,131 +336,3 @@ function errorOut(msg, jqxhr) {
   alert("fehler: "+msg);
   console.log(jqxhr);
 }
-
-$(function() {
-  var $document = $(document);
-  $document.trigger('dom_loaded', $document);
-});
-
-;(function($, doc, win) {
-  "use strict";
-
-  var name = 'vier-gewinnt';
-
-  function VierGewinnt(el, opts) {
-    this.$el      = $(el);
-    this.$el.data(name, this);
-
-    this.defaults = {
-      numCols: 7,
-      numRows: 6,
-      heightStatusbar: 50
-    };
-
-    var meta      = this.$el.data(name + '-opts');
-    this.opts     = $.extend(this.defaults, opts, meta);
-
-    this.data = new Array(this.opts.numCols);
-    for (var i = 0; i < this.opts.numCols; i++) {
-      this.data[i] = new Array(this.opts.numRows);
-    }
-
-    this.curPlayer = 1;
-    this.playerSymbols = ["", "O", "X"];
-
-
-    this.init();
-  }
-
-  VierGewinnt.prototype.init = function() {
-    var self = this;
-
-    self.$el.css('background', '#EEE');
-    self.$el.append('<div class="status" style="height: '+self.opts.heightStatusbar+'px; border-bottom: 1px solid black;" ><span>Spieler 1 ist am Zug!</span></div>');
-
-    self.$el.append('<div class="canvas" />');
-    self.$canvas = self.$el.find('.canvas');
-    self.$canvas.css('width', '100%');
-    self.$canvas.css('height',  self.$el.height() - self.opts.heightStatusbar + "px");
-
-    self.$el.on('click', function(e){
-      if (e.offsetY > self.opts.heightStatusbar) {
-        //Determine clicked col
-        var colWidth = self.$el.width() / self.opts.numCols;
-        var colNum = Math.floor(e.offsetX / colWidth) + 1;
-        
-        self.columnClicked(colNum);
-      }
-    });
-  };
-
-  VierGewinnt.prototype.columnClicked = function(colNum) {
-    var column = this.data[colNum - 1];
-    if (column[this.opts.numRows -1] == undefined) {
-      var i = 0;
-      while (column[i] != undefined) {i++;}
-      
-      column[i] = this.playerSymbols[this.curPlayer];
-
-      this.animateCoin(colNum, i+1);
-
-      this.switchPlayers();
-    }
-  };
-
-  VierGewinnt.prototype.animateCoin = function(colNum, rowNum) {
-    var self = this;
-
-    var colWidth = self.$el.width() / self.opts.numCols;
-    var rowHeight = self.$canvas.height() / self.opts.numRows;
-
-    this.$canvas.append('<div class="coin new player-'+this.curPlayer+'" style="opacity: 1;" />');
-
-    var coin = this.$canvas.find('.new');
-    coin.removeClass('new');
-    coin.css('position', 'absolute');
-    coin.css('top', rowHeight*-1);
-    coin.css('left', (colNum - 1) * colWidth);
-
-    coin.animate({
-      opacity: 1,
-      top: ((this.opts.numRows - rowNum) * rowHeight) + "px"
-    }, 500, function() {
-      // Animation complete.
-    });
-
-  };
-
-  VierGewinnt.prototype.switchPlayers = function() {
-    if (this.curPlayer == 1)
-      this.curPlayer = 2;
-    else
-      this.curPlayer = 1;    
-
-    var statusbar = this.$el.find('.status');
-    statusbar.html('');
-    statusbar.append('<span>Spieler '+ this.curPlayer+' ist am Zug!');
-  }
-
-  VierGewinnt.prototype.destroy = function() {
-    this.$el.off('.' + name);
-    this.$el.find('*').off('.' + name);
-    this.$el.removeData(name);
-    this.$el = null;
-  };
-
-  $.fn.vierGewinnt = function(opts) {
-    return this.each(function() {
-      new VierGewinnt(this, opts);
-    });
-  };
-
-  $(doc).on('dom_loaded ajax_loaded', function(e, nodes) {
-    console.log("dom loaded");
-    var $nodes = $(nodes);
-    var $elements = $nodes.find('.' + name);
-    $elements = $elements.add($nodes.filter('.' + name));
-
-    $elements.vierGewinnt();
-  });
-})(jQuery, document, window);

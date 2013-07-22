@@ -21,15 +21,23 @@ class Model {
     if (!$result) 
       return $this->error(mysql_error());
     else 
-      return true;
+      return mysql_insert_id();
   } 
 
-  public function updateUser($userid,$username, $email, $password) {
-    $sqlbefehl = $this->buildUpdateQuery('user',array(
-        'username' => $username,
-        'email' => $email,
-        'password' => md5($password)
-      ),
+  public function updateUser($userid,$username = null, $email = null, $password = null, $activated = null) {
+    $updateArray = array();
+
+    if ($username != null) 
+      $updateArray['username'] = $username;
+    if ($email != null) 
+      $updateArray['email'] = $email;
+    if ($password != null) 
+      $updateArray['password'] = md5($password);
+    if ($activated != null) 
+      $updateArray['activated'] = $activated;
+
+
+    $sqlbefehl = $this->buildUpdateQuery('user',$updateArray,
       array('id' => $userid));
       $result = mysql_query($sqlbefehl);
       if (!$result) 
@@ -67,7 +75,7 @@ class Model {
   }
 
   public function removeChallenge($userid) {
-    $sqlbefehl = buildDeleteQuery('challenges', array('userid' => $userid));
+    $sqlbefehl = $this->buildDeleteQuery('challenges', array('userid' => $userid));
         
     $result = mysql_query($sqlbefehl);
     if (!$result)
@@ -77,7 +85,19 @@ class Model {
   }
 
   public function getUserByUsername ($username) {
-    $sqlbefehl = "SELECT * FROM user WHERE `username` = '$username'";
+    $sqlbefehl = "SELECT * FROM user WHERE `username` = '".mysql_escape_string($username)."'";
+        
+    $result = mysql_query($sqlbefehl);
+    if (!$result) 
+      return $this->error(mysql_error());
+    else if (mysql_num_rows($result) == 0) {
+      return array();
+    } else {
+      return mysql_fetch_array($result);
+    }
+  }
+  public function getUserByEmail ($email) {
+    $sqlbefehl = "SELECT * FROM user WHERE `email` = '".mysql_escape_string($email)."'";
         
     $result = mysql_query($sqlbefehl);
     if (!$result) 
@@ -129,9 +149,11 @@ class Model {
       return true; 
   }
 
-  public function createGame ($name, $maxPlayers) {
+  public function createGame ($name, $maxPlayers, $p1color,$p2color) {
     $sqlbefehl = $this->buildInsertQuery('games', array(
       'name' => $name,
+      'player1color' => $p1color,
+      'player2color' => $p2color,
       'maxplayers' => $maxPlayers
     ));
 
@@ -213,7 +235,8 @@ class Model {
     $sqlbefehl = "SELECT * 
                   FROM games, current_players
                   WHERE current_players.userid = '". mysql_escape_string($userid)."'
-                  AND games.id = current_players.gameid";
+                  AND games.id = current_players.gameid
+                  AND games.closed = 0";
 
     $result = mysql_query($sqlbefehl);
     if (!$result) 
@@ -287,6 +310,106 @@ class Model {
       return $this->error(mysql_error());
     else 
       return mysql_insert_id();
+  }
+
+  public function checkForWin($gameid, $userid, $x, $y) {
+    $sqlbefehl = "SELECT * from moves WHERE `gameid`='$gameid' AND `userid` = '$userid'";
+
+    
+    $result = mysql_query($sqlbefehl);
+    if (!$result) 
+      return $this->error(mysql_error());
+    else {
+      $moves = array();
+      while (($row = mysql_fetch_array($result))) {
+        $moves[$row['x']][$row['y']] = 1;
+      }
+
+
+      //Horizontal
+      $horizontalCount = 0;
+      //Count to left
+      $i = $x;
+      while (isset($moves[$i][$y]) && $moves[$i][$y] == 1 && $i > 0) { 
+        $horizontalCount++;
+        $i--;
+      }
+      //Count to right
+      $i = $x + 1;
+      while (isset($moves[$i][$y]) && $moves[$i][$y] == 1 && $i <= 7) { 
+        $horizontalCount++;
+        $i++;
+      }
+
+      if ($horizontalCount >= 4) {
+        return true;
+      }
+
+      //vertical
+      $verticalCount = 0;
+      //Count to bottom
+      $i = $y;
+      while (isset($moves[$x][$i]) && $moves[$x][$i] == 1 && $i > 0) { 
+        $verticalCount++;
+        $i--;
+      }
+      //Count to top
+      $i = $y + 1;
+      while (isset($moves[$x][$i]) && $moves[$x][$i] == 1 && $i <= 6) { 
+        $verticalCount++;
+        $i++;
+      }
+      if ($verticalCount >= 4) {
+        return true;
+      }
+
+      //Diagonal \
+      $diag1Count = 0;
+      //Count to topleft
+      $i = $x;
+      $j = $y;
+      while (isset($moves[$i][$j]) && $moves[$i][$j] == 1 && $i > 0 && $j > 0) { 
+        $diag1Count++;
+        $i--;
+        $j--;
+      }
+      //Count to bottom right
+      $i = $x + 1;
+      $j = $y + 1;
+      while (isset($moves[$i][$j]) && $moves[$i][$j] == 1 && $i > 0 && $j > 0) { 
+        $diag1Count++;
+        $i++;
+        $j++;
+      }
+      if ($diag1Count >= 4) {
+        return true;
+      }
+
+      //Diagonal /
+      $diag2Count = 0;
+      //Count to topright
+      $i = $x;
+      $j = $y;
+      while (isset($moves[$i][$j]) && $moves[$i][$j] == 1 && $i <= 7 && $j > 0) { 
+        $diag2Count++;
+        $i++;
+        $j--;
+      }
+      //Count to bottom left
+      $i = $x - 1;
+      $j = $y + 1;
+      while (isset($moves[$i][$j]) && $moves[$i][$j] == 1 && $i > 0 && $j <= 6) { 
+        $diag2Count++;
+        $i--;
+        $j++;
+      }
+      if ($diag2Count >= 4) {
+        return true;
+      }
+
+      return false;
+
+    }
   }
 
 

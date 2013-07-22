@@ -1,23 +1,38 @@
 
 html {
-  font-family: Helvetica, Verdana, Arial, sans-serif;
+  font-family: 'Yanone Kaffeesatz', Helvetica, Verdana, Arial, sans-serif;
 }
 body {
   margin: 0;
   padding: 0;
-  background: #eee;
+  background: url("images/bg.png") repeat-x  0 0 #eee;
+}
+a {
+  text-decoration: none;
+  color: #444;
+}
+a:hover {
+  color: #AAA;
+}
+ul {
+  padding-left: 25px;
 }
 .wrapper {
-  width: 700px;
+  width: 525px;
   margin: 0px auto;
 }
 header {
-  height: 100px;
+  height: 97px;
   position: relative;
-  background: rgba(249,249,249,1);
 }
 header h1 {
-  margin-top: 0;
+  position: absolute;
+  top: 20px;
+  left:0px;
+}
+h3 {
+
+  border-bottom: 1px solid #f7d86e;
 }
 .userarea {
   position: absolute;
@@ -26,21 +41,24 @@ header h1 {
   width: 200px;
   text-align: right;
   font-size: small;
-  color: #999;
+  color: #474646;
+  font-weight: 200;
 }
 nav {
   width: 100%;
-
+  font-weight: 200;
+  letter-spacing: 1px;
+  height: 30px;
 
   background: rgb(249,249,249); /* Old browsers */
-background: -moz-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(239,239,239,1) 63%, rgba(219,219,219,1) 99%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(249,249,249,1)), color-stop(63%,rgba(239,239,239,1)), color-stop(99%,rgba(219,219,219,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* IE10+ */
-background: linear-gradient(to bottom, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-9 */
-  
+  background: -moz-linear-gradient(top, rgba(249,249,249,1) 0%, rgba(239,239,239,1) 63%, rgba(219,219,219,1) 99%); /* FF3.6+ */
+  background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(249,249,249,1)), color-stop(63%,rgba(239,239,239,1)), color-stop(99%,rgba(219,219,219,1))); /* Chrome,Safari4+ */
+  background: -webkit-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* Chrome10+,Safari5.1+ */
+  background: -o-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* Opera 11.10+ */
+  background: -ms-linear-gradient(top, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* IE10+ */
+  background: linear-gradient(to bottom, rgba(249,249,249,1) 0%,rgba(239,239,239,1) 63%,rgba(219,219,219,1) 99%); /* W3C */
+  filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f9f9f9', endColorstr='#dbdbdb',GradientType=0 ); /* IE6-9 */
+    
 
 }
 
@@ -49,39 +67,39 @@ nav .elem {
   float: left;
   padding: 5px;
   position: relative;
-  opacity: 0.5;
+  opacity: 0.7;
   margin-right: 5px;
-
-  background: rgb(240,249,255); /* Old browsers */
-background: -moz-linear-gradient(top, rgba(240,249,255,1) 0%, rgba(203,235,255,1) 47%, rgba(161,219,255,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(240,249,255,1)), color-stop(47%,rgba(203,235,255,1)), color-stop(100%,rgba(161,219,255,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* IE10+ */
-background: linear-gradient(to bottom, rgba(240,249,255,1) 0%,rgba(203,235,255,1) 47%,rgba(161,219,255,1) 100%); /* W3C */
-filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#f0f9ff', endColorstr='#a1dbff',GradientType=0 ); /* IE6-9 */
+  height: 20px;
+  background: rgb(255,230,147);
+background: -moz-linear-gradient(top,  rgba(255,230,147,1) 0%, rgba(255,220,185,1) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,230,147,1)), color-stop(100%,rgba(255,220,185,1)));
+background: -webkit-linear-gradient(top,  rgba(255,230,147,1) 0%,rgba(255,220,185,1) 100%);
+background: -o-linear-gradient(top,  rgba(255,230,147,1) 0%,rgba(255,220,185,1) 100%);
+background: -ms-linear-gradient(top,  rgba(255,230,147,1) 0%,rgba(255,220,185,1) 100%);
+background: linear-gradient(to bottom,  rgba(255,230,147,1) 0%,rgba(255,220,185,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffe693', endColorstr='#ffdcb9',GradientType=0 );
 }
-nav .elem a {
+nav .elem a.gamelink,nav .elem a.lobby  {
   text-decoration: none;
   color: black;
-  text-shadow: 0px -2px 0px rgba(255, 255, 255, 1)
+  text-shadow: 0px 1px 0px rgba(255, 255, 255, 1)
 }
 nav .elem.active {
   text-decoration: none;
-
-  background: rgb(135,224,253); /* Old browsers */
-background: -moz-linear-gradient(top, rgba(135,224,253,1) 0%, rgba(83,203,241,1) 40%, rgba(5,171,224,1) 100%); /* FF3.6+ */
-background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(135,224,253,1)), color-stop(40%,rgba(83,203,241,1)), color-stop(100%,rgba(5,171,224,1))); /* Chrome,Safari4+ */
-background: -webkit-linear-gradient(top, rgba(135,224,253,1) 0%,rgba(83,203,241,1) 40%,rgba(5,171,224,1) 100%); /* Chrome10+,Safari5.1+ */
-background: -o-linear-gradient(top, rgba(135,224,253,1) 0%,rgba(83,203,241,1) 40%,rgba(5,171,224,1) 100%); /* Opera 11.10+ */
-background: -ms-linear-gradient(top, rgba(135,224,253,1) 0%,rgba(83,203,241,1) 40%,rgba(5,171,224,1) 100%); /* IE10+ */
-background: linear-gradient(to bottom, rgba(135,224,253,1) 0%,rgba(83,203,241,1) 40%,rgba(5,171,224,1) 100%); /* W3C */
+background: rgb(255,200,13);
+background: -moz-linear-gradient(top,  rgba(255,200,13,1) 0%, rgba(255,168,76,1) 100%);
+background: -webkit-gradient(linear, left top, left bottom, color-stop(0%,rgba(255,200,13,1)), color-stop(100%,rgba(255,168,76,1)));
+background: -webkit-linear-gradient(top,  rgba(255,200,13,1) 0%,rgba(255,168,76,1) 100%);
+background: -o-linear-gradient(top,  rgba(255,200,13,1) 0%,rgba(255,168,76,1) 100%);
+background: -ms-linear-gradient(top,  rgba(255,200,13,1) 0%,rgba(255,168,76,1) 100%);
+background: linear-gradient(to bottom,  rgba(255,200,13,1) 0%,rgba(255,168,76,1) 100%);
+filter: progid:DXImageTransform.Microsoft.gradient( startColorstr='#ffc80d', endColorstr='#ffa84c',GradientType=0 );
 
 }
 nav .elem:hover {
-  opacity: 0.7;
+  opacity: 1;
 }
-nav .elem a[data-id] {
+nav .elem a[data-id].gamelink {
   padding-left: 25px;
 }
 nav .elem a.close {
@@ -99,26 +117,118 @@ nav .elem a.close:hover {
   opacity: 1;
 }
 .content {
-  padding-top: 20px;
+  padding-top: 5px;
   background: white;
-  min-height: 650px;
+  min-height: 500px;
+}
+.leftCol {
+  width: 250px;
+  float: left;
+  padding: 10px;
+}
+.rightCol {
+  width: 180px;
+  float: right;
+  padding: 10px;
+  display: none;
+  position: relative;
+}
+
+.leftCol h3, .rightCol h3 {
+  margin-top: 5px;
+}
+.rightCol a.close {
+  position: absolute;
+  top: 5px;
+  right: 10px;
+  text-decoration: none;
+  font-size: 25px;
+  opacity: 0.5;
+}
+.rightCol a.close:hover {
+  opacity: 1;
+}
+.toolbar a {
+  color: black;
+  text-decoration: none;
+  padding: 2px 5px;
+  border: 1px solid #999;
+  background: #F3F3F3;
+  font-size: small;
+  font-weight: 200;
+  border-radius: 3px;
+}
+.toolbar a:hover {
+  border-color: #f7d86e;;
+}
+.toolbar a:active {
+  opacity: 0.5;
+}
+.gameslist {
+  margin-top: 15px;
+}
+.gameslist .empty {
+  color: #777;
 }
 .gameslist li span {
   font-size: small;
   color: #999;
 }
+
+.rightCol input {
+  display: block;
+  width: 170px;
+  margin-bottom: 10px;
+}
+.rightCol input.error {
+  border-color: red;
+  background: 255, 239, 239;
+}
+
+.colorPicker {
+  margin-bottom: 10px;
+  margin-top: 5px;
+}
+.colorPicker.error {
+  color: red;
+}
+.colorPicker ul {
+  width: 180px;
+  padding: 0;
+  margin: 0;
+}
+.colorPicker ul li {
+  float: left;
+  margin: 0 5px 5px 0;
+}
+.colorPicker ul li a {  
+  display: block;
+  width: 13px;
+  height: 13px;
+  text-decoration: none;
+  text-indent: -100000px;
+  outline: 0;
+  border: 1px solid #aaa;
+}
+.colorPicker ul li a:hover {
+  border-color: black;
+}
+.colorPicker ul li a.active {
+  border-color: black;
+}
+
 .game-container {
-  width: 700px;
-  height: 650px;
+  width: 525px;
+  height: 500px;
 }
 .canvas {
   position: relative;
 }
 .coin {
-  width: 90px;
-  height: 90px;
-  border-radius: 45px;
-  margin: 5px;
+  width: 70px;
+  height: 70px;
+  border-radius: 35px;
+  margin: 3px;
 }
 .coin.player-1 {
   background: blue;
@@ -130,6 +240,7 @@ nav .elem a.close:hover {
   line-height: 50px;
   text-align: center;
 }
+
 .clear {
   clear: both;
 }

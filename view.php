@@ -6,9 +6,19 @@ $controller = new Controller();
 $loginData = $controller->getLoginData();
 
 switch ($_GET['action']) {
-  case 'register':
+  case 'login':
     $controller->checkLogin(false, true);
-    $controller->login($_POST);
+    $ret = $controller->login($_POST);
+
+    if (!is_array($ret)) { //LOGIN WAS SUCCEESFUL
+
+      $ref =  (isset($args['ref'])) ? $args['ref'] :  Controller::$mainPage;
+
+      header("Location: ".$ref);
+      die();
+    } else {
+      header("Location: ".Controller::$loginPage."?errmsg=".$ret['msg']);
+    }
     break;
 
   case 'logout':
@@ -79,6 +89,50 @@ switch ($_GET['action']) {
       die();
 
     die(json_encode($controller->submitMove($_GET)));
+    break;
+
+  case 'register':
+    $controller->checkLogin(false, true);
+
+    $ret = $controller->register($_POST);
+
+    $ref = explode('?', $_SERVER['HTTP_REFERER']);
+    $ref = $ref[0];
+
+    if ($ret['error'] == true) {
+      header('Location: '.$ref.'?regerror='.urlencode($ret['msg']));
+    } else {
+      header('Location: '.$ref.'?challenge='.urlencode($ret['challenge']).'&userid='.$ret['userid']);
+    }
+
+    break;
+
+  case 'challenge':
+    $controller->checkLogin(false, true);
+
+    $ret = $controller->checkChallenge($_GET);
+
+    if (is_array($ret)) {
+      header('Location: '.Controller::$loginPage.'?errmsg='.urlencode($ret['msg']));
+    } else {
+      header('Location: '.Controller::$loginPage.'?msg='.urlencode("Vielen Dank, Sie können sich nun einloggen!"));
+    }
+
+    break;
+
+  case 'leave':
+    if ($loginData['loggedin'] == false)
+      die();
+
+    $ret = $controller->leaveGame($_GET);
+    if ($ret != true) {
+      http_response_code(400);
+      die(json_encode($ret));
+    } else {
+      die(json_encode(array()));
+    }
+
+    
     break;
 
 

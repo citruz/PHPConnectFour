@@ -13,7 +13,7 @@ class Controller {
 
   function __construct() {
     $this->model = new Model();
-    $this->user = null;
+    $this->user = null; 
 
     $this->getLoginData();
   }
@@ -46,31 +46,105 @@ class Controller {
     }
   }
 
+  public function checkChallenge($args) {
+    if (!isset($args['userid']) || !isset($args['challenge'])) {
+      return array("error" => true, "msg" => "Challenge: Falsche Parameter.");
+    }
+
+    $challenge_db = $this->model->getChallenge($args['userid']);
+    if (count($challenge_db) == 0) {
+      return array("error" => true, "msg" => "Challenge nicht gefunden.");
+    }
+
+    if ($challenge_db['challenge'] == $args['challenge']) {
+      $this->model->removeChallenge($args['userid']);   
+      $this->model->updateUser($args['userid'], null, null, null , '1');
+      return true;
+    } else {
+      return array("error" => true, "msg" => "Challenge falsch.");
+    }
+  }
+
   public function login($args) {
     if (!isset($args['username']) || trim($args['username']) == '') 
-      return "Username ungültig.";
+      return array("error" => true, "msg" => "Username ungültig.");
 
     if (!isset($args['password']) || trim($args['password']) == '') 
-      return "Passwort ungültig.";
+      return array("error" => true, "msg" => "Passwort ungültig.");
 
     $user = $this->model->getUserByUsername($args['username']);
+
+    if ($user && $user['activated'] != '1') {
+      return array("error" => true, "msg" => "Bitte bestätigen Sie zuerst den Link in ihrer Email.");     
+    }
 
     if ($user && $user['password'] === md5($args['password'])) {
       //Login Successful
       $this->user = $user;
       $this->model->createSession($user['id'], session_id());
 
-      $ref =  (isset($args['ref'])) ? $args['ref'] :  self::$mainPage;
-
-      header("Location: ".$ref);
-      die();
+      return true;
     } else {
-      header("Location: ".$ref."?msg=".urlencode("Ungültige Login-Daten."));
+      return array("error" => true, "msg" => "Ungültige Login-Daten.");
     }
 
   }
 
-  
+  public function register($args) {
+    $errorMsg = "";
+    if (!isset($args['username']) || (($username = $this->checkString($args['username'], 3)) === false)) {
+      $errorMsg = $errorMsg . "Ungültiger Username.\n";
+    }
+    if (!isset($args['email']) || (($email = $this->checkString($args['email'], 5, FILTER_VALIDATE_EMAIL)) === false)) {
+      $errorMsg = $errorMsg . "Ungültige Emailadresse.\n";
+    }
+    if (!isset($args['password']) || (($password = $this->checkString($args['password'], 6)) === false)) {
+      $errorMsg = $errorMsg . "Ungültiges Passwort.\n";
+    }
+    $_SESSION['temp_user'] = $username;
+    $_SESSION['temp_email'] = $email;
+    
+    if (strlen($errorMsg) > 0) {
+      return array('error' => 'true', 'msg' => $errorMsg);
+    }
+
+    if (count($this->model->getUserByUsername($username)) != 0) {
+      return array('error' => 'true', 'msg' => 'Username schon vorhanden.'); 
+    }
+
+    if (count($this->model->getUserByEmail($email)) != 0) {
+      return array('error' => 'true', 'msg' => 'Ein User mit dieser Email Adresse ist schon vorhanden.'); 
+    }
+
+    $userid = $this->model->createUser($username, $email, $password);
+
+    if (is_array($userid)) //Fehler
+      return ret;
+
+    $challenge = $this->model->createChallenge($userid);
+    
+    if (is_array($challenge)) //Fehler
+      return ret;
+
+    //Registrierung vollständig
+
+    $_SESSION['temp_user'] = "";
+    $_SESSION['temp_email'] = "";
+
+    return array('error' => false, 'challenge' => $challenge, 'userid' => $userid);
+  }
+
+  private function checkString($str, $minLength, $filter = null) {
+    $str = trim($str);
+    if (strlen($str) >= $minLength) {
+      if ($filter != null && !filter_var($str, $filter)) {
+        return false;
+      }
+      return $str;
+    } else {
+      return false;
+    }
+  }
 
   public function logout() {
     if (($err = $this->model->removeSession($this->user['userid'], session_id())) === true) {
@@ -101,26 +175,34 @@ class Controller {
 
   public function createGame($args) {
     if ($this->user != null) {
-      if (isset($args['name']) && trim($args['name']) != "") {
-        $name = $args['name'];
-        $ret = $this->model->createGame($args['name'], 2);
-        if (!is_array($ret)) {
-          //Game created
-          //Assign User to game
-          if (($err = $this->model->assignUserToGame($this->user['userid'], $ret)) ===  true) {
-            //Everything successful
-            return $ret;
-          } else {
-            //Assign failed
-            return array('error' => 'Erstellung des Games fehlgeschlagen: '.$err['msg'].'.');
-          }
-        } else {
-          //Create game failed
-          return array('error' => 'Erstellung des Games fehlgeschlagen: '.$ret['msg'].'.');
-        }
-      } else {
+      if (!isset($args['name']) || trim($args['name']) == "") {
         return array('error' => 'Ungültiger Name');
       }
+      if (!isset($args['player1color']) || trim($args['name']) == "player1color") {
+        return array('error' => 'Ungültige Farbe für Spieler 1');
+      }
+      if (!isset($args['player2color']) || trim($args['player2color']) == "") {
+        return array('error' => 'Ungültige Farbe für Spieler 2');
+      }
+
+
+      $name = $args['name'];
+      $ret = $this->model->createGame($args['name'], 2, $args['player1color'], $args['player2color']);
+      if (!is_array($ret)) {
+        //Game created
+        //Assign User to game
+        if (($err = $this->model->assignUserToGame($this->user['userid'], $ret)) ===  true) {
+          //Everything successful
+          return $ret;
+        } else {
+          //Assign failed
+          return array('error' => 'Erstellung des Games fehlgeschlagen: '.$err['msg'].'.');
+        }
+      } else {
+        //Create game failed
+        return array('error' => 'Erstellung des Games fehlgeschlagen: '.$ret['msg'].'.');
+      }
+
     } else {
         return array('error' => 'Nicht authentifiziert.');
     }
@@ -220,8 +302,18 @@ class Controller {
         $ret = $this->model->addMove($gamestate['game']['game']['id'], $this->user['userid'], $args['x'], $minY-1);
         if (is_array($ret)) 
           return $ret;
-        else 
+        else {
+          //Check for win
+          $win = $this->model->checkForWin($gamestate['game']['game']['id'], $this->user['userid'], $args['x'], $minY-1);
+
+          if ($win) {
+            $ret = $this->model->closeGame($args['gameid'], $this->user['userid']);
+            if ($ret != true)
+              return $ret;
+          }
+                
           return $this->getGameState($args);
+        }
 
       } else {
         return array('error' => 'true', 'msg' => 'Du bist nicht aktueller Spieler.');
@@ -230,6 +322,22 @@ class Controller {
       return $gameinfo;
     }
     
+  }
+
+  public function leaveGame($args) {
+
+    $gamestate = $this->getGameState($args);
+    if (is_array($gamestate) && !isset($gameinfo['error'])) {
+      //User and gameid validated
+      $ret = $this->model->closeGame($args['gameid']);
+      if ($ret != true)
+        return $ret;
+
+      return true;
+    } else {
+      return $gamestate;
+    }
+
   }
 
   private function curPageName() {
