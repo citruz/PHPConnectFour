@@ -110,7 +110,7 @@ if (isset($_POST['username']))
                     <!-- Username -->
                     <label class="control-label"  for="username">Username</label>
                     <div class="controls">
-                      <input type="text" id="username" name="username" placeholder="" class="input-xlarge">
+                      <input type="text" id="username" name="username" placeholder="" class="input-xlarge" required>
                       
 
                     </div>
@@ -120,7 +120,7 @@ if (isset($_POST['username']))
                     <!-- Password-->
                     <label class="control-label" for="password">Passwort</label>
                     <div class="controls">
-                      <input type="password" id="password" name="password" placeholder="" class="input-xlarge">
+                      <input type="password" id="password" name="password" placeholder="" class="input-xlarge" required>
                     </div>
                   </div>
 
@@ -147,20 +147,20 @@ if (isset($_POST['username']))
                     <!-- Username -->
                     <label class="control-label" for="username">Username</label>
                     <div class="controls">
-                      <input type="text" value="<?php if (isset($_SESSION['temp_user'])) echo $_SESSION['temp_user'];?>" class="input-xlarge" name="username">
+                      <input type="text" value="<?php if (isset($_SESSION['temp_user'])) echo $_SESSION['temp_user'];?>" class="input-xlarge" name="username" required>
                       <small class="help-block">Mindestens 3, maximal 50 Zeichen.</small>
                     </div>
                   </div>
                   <div class="control-group">
                     <label class="control-label" for="email">Email</label>
                     <div class="controls">
-                      <input type="text" value="<?php if (isset($_SESSION['temp_user'])) echo $_SESSION['temp_email'];?>" class="input-xlarge" name="email">
+                      <input type="email" value="<?php if (isset($_SESSION['temp_email'])) echo $_SESSION['temp_email'];?>" class="input-xlarge" name="email" required>
                     </div>
                   </div>
                   <div class="control-group">
                     <label class="control-label" for="password">Passwort</label>
                     <div class="controls">
-                      <input type="password" value="" class="input-xlarge" name="password">
+                      <input type="password" value="" class="input-xlarge" name="password" required>
                       <small class="help-block">Mindestens 6, maximal 50 Zeichen.</small>
                     </div>
                   </div>

@@ -1,12 +1,23 @@
 <?php
+/**
+  * Das Model tätigt alle Datenbankzugriffe und enthält ansonsten wenig Programmlogilk.
+  */
 class Model {
-
+/**
+  * Erstellt eine neue Modelinstanz und öffnet die Verbindung zur Datenbank.
+  */
   public function __construct() {
     mysql_connect("localhost", "root", "root") or $this->error('Database Connection failed');
     mysql_select_db("viergewinnt") or $this->error('Database selection failed.');
   }
 
-
+/**
+  * Fügt einen neuen User in der Datenbank ein.
+  * @param string $username Benutzername
+  * @param string $email Email Adresse
+  * @param string $password Passwort
+  * @return integer|array Im Erfolgsfall die neue Userid, ansonsten Array mit Errornachricht.
+  */
   public function createUser($username, $email, $password) {
     if (count($this->getUserByUsername($username)) != 0) 
       return $this->error('User'.$username.' already exists');
@@ -24,6 +35,15 @@ class Model {
       return mysql_insert_id();
   } 
 
+/**
+  * Ändert die Daten eines Users in der Datenbank.
+  * @param string $userid ID des zu ändernden Users
+  * @param null|string $username Benutzername, oder null fall keine Änderung erwünscht
+  * @param null|string $email Email Adresse, oder null fall keine Änderung erwünscht
+  * @param null|string $password Passwort, oder null fall keine Änderung erwünscht
+  * @param null|integer $activated 1 oder 0, oder null fall keine Änderung erwünscht
+  * @return bool|array Im Erfolgsfall true, ansonsten Array mit Errornachricht.
+  */
   public function updateUser($userid,$username = null, $email = null, $password = null, $activated = null) {
     $updateArray = array();
 
@@ -46,6 +66,11 @@ class Model {
         return true;
   }
 
+/**
+  * Generiert einen Challenge für einen User und fügt Sie in die Datenbank.
+  * @param string $userid ID des Users.
+  * @return string|array Im Erfolgsfall challenge, ansonsten Array mit Errornachricht.
+  */
   public function createChallenge($userid) {
     $this->removeChallenge($userid);
     $challenge = md5(rand() . time());
@@ -61,6 +86,11 @@ class Model {
       return $challenge;
   }
 
+/**
+  * Holt challenge von einerm User aus der Datenbank.
+  * @param string $userid ID des Users.
+  * @return array 
+  */
   public function getChallenge($userid) {
     $sqlbefehl = $this->buildSelectQuery('challenges', array('challenge'), array('userid' => $userid));
         
@@ -74,6 +104,11 @@ class Model {
     }
   }
 
+/**
+  * Löscht eine Challnege aus der Datenbank.
+  * @param string $userid ID des Users.
+  * @return bool|array Im Erfolgsfall true, ansonsten Array mit Errornachricht.
+  */
   public function removeChallenge($userid) {
     $sqlbefehl = $this->buildDeleteQuery('challenges', array('userid' => $userid));
         
@@ -83,7 +118,11 @@ class Model {
     else
       return true; 
   }
-
+/**
+  * Sucht einen User anhand des Usernamens.
+  * @param string $username Username des Users.
+  * @return array 
+  */
   public function getUserByUsername ($username) {
     $sqlbefehl = "SELECT * FROM user WHERE `username` = '".mysql_escape_string($username)."'";
         
@@ -96,6 +135,12 @@ class Model {
       return mysql_fetch_array($result);
     }
   }
+
+/**
+  * Sucht einen User anhand der Emailadresse.
+  * @param string $email Email des Users.
+  * @return array 
+  */
   public function getUserByEmail ($email) {
     $sqlbefehl = "SELECT * FROM user WHERE `email` = '".mysql_escape_string($email)."'";
         
@@ -109,46 +154,61 @@ class Model {
     }
   }
 
-  public function getLoginUser($session_id) {
-    $sqlbefehl = "SELECT `userid`, `username`, `email` 
-                  FROM user, sessions 
-                  WHERE user.id = sessions.userid  
-                    AND user.activated = '1'
-                    AND sessions.session = '".mysql_escape_string($session_id)."'";
+/**
+  * Sucht einen User anhand der aktuellen Session.
+  * @return array 
+  */
+  public function getLoginUser() {
+    if (!isset($_SESSION['userid']))
+      return false;
+
+    $sqlbefehl = "SELECT `id` AS `userid`, `username`, `email` 
+                  FROM user 
+                  WHERE user.id = '".mysql_escape_string($_SESSION['userid'])."'  
+                    AND user.activated = '1'";
 
     $result = mysql_query($sqlbefehl);
     if (!$result) 
       return $this->error(mysql_error());
     else if (mysql_num_rows($result) == 0) {
-      return array();
+      return false;
     } else {
       return mysql_fetch_array($result);
     }
   }
 
-  public function createSession($userid, $session_id) {
-    $sqlbefehl = $this->buildInsertQuery('sessions', array(
-      'userid' => $userid,
-      'session' => $session_id
-    ));
-
-    $result = mysql_query($sqlbefehl);
-    if (!$result) 
-      return $this->error(mysql_error());
-    else 
-      return true;
+/**
+  * Erstellt eine neue Session mit der angebenen Userid.
+  * @param string $userid ID des Users.
+  */
+  public function createSession($userid) {
+    $_SESSION['userid'] = $userid;
   }
 
-  public function removeSession($userid, $session_id) {
-    $sqlbefehl = $this->buildDeleteQuery('sessions', array('userid' => $userid, 'session' => $session_id));
-        
-    $result = mysql_query($sqlbefehl);
-    if (!$result)
-      return $this->error(mysql_error());
-    else
-      return true; 
+/**
+  * Löscht die aktuellen Sessioninformationen.
+  */
+  public function removeSession() {
+    // Variablen mit leerem Array überschreiben
+    $_SESSION = array();
+    // Cookie löschen (Lebensdauer in der Verg.)
+    if (isset($_COOKIE[session_name()])) {
+        setcookie(session_name(), '', time()-42000, '/'); }
+    // Session löschen
+    session_destroy();
+
+    return true;
+
   }
 
+/**
+  * Erstellt eine Spiel mit den angebenen Daten.
+  * @param string $name Name des Spiels
+  * @param int $maxPlayers Maximale Anzahl der Spieler
+  * @param string $p1color Farbe des ersten Spielers.
+  * @param string $p2color Farbe des zweiten Spielers.
+  * @return integer|array Im Erfolgsfall id des neuen Spiels, ansonsten Array mit Errornachricht.
+  */
   public function createGame ($name, $maxPlayers, $p1color,$p2color) {
     $sqlbefehl = $this->buildInsertQuery('games', array(
       'name' => $name,
@@ -164,6 +224,12 @@ class Model {
       return mysql_insert_id();
   }
 
+/**
+  * Setzt ein Spiel auf closed.
+  * @param int $gameid ID des Spiels
+  * @param int|null $winnderid ID des Gewinners oder null, falls kein Gewinner
+  * @return bool|array Im Erfolgsfall true, ansonsten Array mit Errornachricht.
+  */
   public function closeGame ($gameid,$winnerid = null) {
     if ($winnerid == null) {
       $values = array(
@@ -186,6 +252,10 @@ class Model {
       return true;
   }
 
+  /**
+    * Holt alle Spiele aus der Datenbank 
+    * @return array
+    */
   public function getGames() {
     $sqlbefehl = "SELECT * 
                   FROM games";
@@ -202,6 +272,11 @@ class Model {
     }
   }
 
+/**
+  * Holt ein Spiel anhand der ID.
+  * @param string $gameid ID des Spiels.
+  * @return array 
+  */
   public function getGame($gameid) {
     $sqlbefehl = "SELECT * FROM games WHERE `id` = '".mysql_escape_string($gameid)."'";
         
@@ -214,6 +289,11 @@ class Model {
       return mysql_fetch_array($result);
     }
   }
+/**
+  * Gibt alle User die an einem Spiel teilnehmen zurück.
+  * @param integer $gameid ID des Spiels.
+  * @return array 
+  */
   public function getUsersForGame($gameid) {
     $sqlbefehl = "SELECT user.id, user.email, user.username 
                   FROM user, current_players
@@ -231,6 +311,12 @@ class Model {
       return $array;
     }
   }
+
+  /**
+  * Gibt alle Spiele an denen der User teilnimmt zurück.
+  * @param integer $userid ID des Users.
+  * @return array 
+  */
   public function getGamesForUser($userid) {
     $sqlbefehl = "SELECT * 
                   FROM games, current_players
@@ -250,6 +336,14 @@ class Model {
     }
   }
 
+
+
+/**
+  * Weist einem User ein Spiel zu.
+  * @param string $userid ID des Users.
+  * @param string $gameid ID des Spiels.
+  * @return bool|array Im Erfolgsfall true, ansonsten Array mit Errornachricht.
+  */
   public function assignUserToGame($userid, $gameid) {
     $sqlbefehl = $this->buildInsertQuery('current_players', array(
       'userid' => $userid,
@@ -263,6 +357,13 @@ class Model {
       return true;
   }
 
+
+/**
+  * Gibt alle Spielzüge eines Spiels zurück.
+  * @param string $userid ID des Users.
+  * @param integer|0 $minId Min ID des Spielzugs.
+  * @return array 
+  */
   public function getGameMoves($gameid, $minId = 0) {
     $sqlbefehl = "SELECT * 
                   FROM moves
@@ -270,10 +371,10 @@ class Model {
                     AND id > ".mysql_escape_string($minId);
 
     $result = mysql_query($sqlbefehl);
+    $array = array();
     if (!$result) 
       return $this->error(mysql_error());
     else {
-      $array = array();
       while (($row = mysql_fetch_array($result))) {
         array_push($array, $row);  
       }
@@ -282,6 +383,12 @@ class Model {
 
   }
 
+/**
+  * Gibt die Anzahl an Spielzügen eines Users bei einem Spiel zurück.
+  * @param string $userid ID des Users.
+  * @param string $gameid ID des Spiels.
+  * @return array 
+  */
   public function getNumGameMoves($gameid, $userid) {
     $sqlbefehl = "SELECT COUNT(*) AS num 
                   FROM moves
@@ -297,6 +404,14 @@ class Model {
 
   }
 
+/**
+  * Erstellt einen Spielzug mit den angebenen Daten.
+  * @param string $gameid ID des Spiels
+  * @param string $userid ID des Spielers
+  * @param int $x x Koordinate
+  * @param int $y y Koordinate
+  * @return integer|array Im Erfolgsfall id des neuen Spielzugs, ansonsten Array mit Errornachricht.
+  */
   public function addMove($gameid, $userid, $x, $y) {
     $sqlbefehl = $this->buildInsertQuery('moves', array(
       'gameid' => $gameid,
@@ -312,6 +427,14 @@ class Model {
       return mysql_insert_id();
   }
 
+/**
+  * Überprüft ob Spieler mit letzem Zug gewonnen hat.
+  * @param string $gameid ID des Spiels
+  * @param string $userid ID des Spielers
+  * @param int $x x Koordinate
+  * @param int $y y Koordinate
+  * @return bool
+  */
   public function checkForWin($gameid, $userid, $x, $y) {
     $sqlbefehl = "SELECT * from moves WHERE `gameid`='$gameid' AND `userid` = '$userid'";
 

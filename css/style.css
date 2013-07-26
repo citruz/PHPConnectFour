@@ -200,6 +200,7 @@ nav .elem a.close:hover {
 .colorPicker ul li {
   float: left;
   margin: 0 5px 5px 0;
+  list-style: none;
 }
 .colorPicker ul li a {  
   display: block;
@@ -223,6 +224,7 @@ nav .elem a.close:hover {
 }
 .canvas {
   position: relative;
+  background: url("images/canvasbg.png");
 }
 .coin {
   width: 70px;

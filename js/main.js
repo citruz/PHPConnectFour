@@ -17,6 +17,7 @@ $(document).ready(function(){
       $('#mainmenu').show();
       $('nav .elem').removeClass('active');
       $('nav .elem:first').addClass('active');
+      currentGameId = undefined;
       getGames();
     }
 

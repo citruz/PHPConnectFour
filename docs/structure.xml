@@ -1,0 +1,993 @@
+<?xml version="1.0" encoding="utf-8"?>
+<project version="2.0.0b7&#10;">
+  <file path="controller.php" generated-path="controller.html" hash="b4efc0852cfe684e9b1d60f8415d0287" package="">
+    <docblock line="0">
+      <description></description>
+      <long-description></long-description>
+    </docblock>
+    <class final="false" abstract="false" namespace="" line="9" package="">
+      <extends/>
+      <name>Controller</name>
+      <full_name>\Controller</full_name>
+      <docblock line="9">
+        <description>Der Controller ist dafür zuständig, alle Anfragen vom User auszuwerten,
+zu validieren und ggf. an das Model weiterzuleiten.</description>
+        <long-description></long-description>
+      </docblock>
+      <property static="false" visibility="private" line="10" namespace="" package="">
+        <name>$model</name>
+        <default></default>
+        <docblock line="10">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <property static="false" visibility="private" line="11" namespace="" package="">
+        <name>$user</name>
+        <default></default>
+        <docblock line="11">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <property static="true" visibility="public" line="13" namespace="" package="">
+        <name>$loginPage</name>
+        <default>"login.php"</default>
+        <docblock line="13">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <property static="true" visibility="public" line="14" namespace="" package="">
+        <name>$mainPage</name>
+        <default>"index.php"</default>
+        <docblock line="14">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <property static="true" visibility="public" line="15" namespace="" package="">
+        <name>$registerPage</name>
+        <default>"register.php"</default>
+        <docblock line="15">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <property static="true" visibility="public" line="16" namespace="" package="">
+        <name>$gamePage</name>
+        <default>"viewgame.php"</default>
+        <docblock line="16">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </property>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="22" package="">
+        <name>__construct</name>
+        <full_name>\Controller::__construct()</full_name>
+        <docblock line="22">
+          <description>Erstellt eine neue Controllerinstanz und gleichzeitig eine Modelinstanz.</description>
+          <long-description>Holt automatisch die Login Daten des Benutzers, falls vorhanden.</long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="33" package="">
+        <name>getLoginData</name>
+        <full_name>\Controller::getLoginData()</full_name>
+        <docblock line="33">
+          <description>Überprüft, ob der User eingeloggt ist und gibt dessen Logininformationen zurück.</description>
+          <long-description></long-description>
+          <tag name="return" description="Array mit Userinformationen." line="33" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="58" package="">
+        <name>checkLogin</name>
+        <full_name>\Controller::checkLogin()</full_name>
+        <docblock line="58">
+          <description>Überprüft den Login-Status des Users.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;Wenn der Paramter true ist und der User nicht eingeloggt seien sollte, wird er auf die Login-Seite weitergeleitet.&lt;/p&gt;&#10;" line="58" type="bool" variable="$needsLogin">
+            <type>bool</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Wenn Paramter true ist und der User eingeloggt seien sollte, wird er auf die Index-Seite weitergeleitet.&lt;/p&gt;&#10;" line="58" type="bool" variable="$needsNoLogin">
+            <type>bool</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$needsLogin</name>
+          <default></default>
+          <type>bool</type>
+        </argument>
+        <argument line="0">
+          <name>$needsNoLogin</name>
+          <default></default>
+          <type>bool</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="74" package="">
+        <name>checkChallenge</name>
+        <full_name>\Controller::checkChallenge()</full_name>
+        <docblock line="74">
+          <description>Überprüft ob die Challenge erfüllt wurde. Wenn ja wird sie aus der Datenbank entfernt und der User auf activated gesetzt.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'challenge' und 'userid' müssen gesetzt sein.&lt;/p&gt;&#10;" line="74" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="74" type="true|array">
+            <type>true</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="98" package="">
+        <name>login</name>
+        <full_name>\Controller::login()</full_name>
+        <docblock line="98">
+          <description>Überprüft übergebenen Username und Passwort auf Gültigkeit. Loggt User ein, falls korrekt.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'username' und 'password' müssen gesetzt sein.&lt;/p&gt;&#10;" line="98" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="98" type="true|array">
+            <type>true</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="128" package="">
+        <name>register</name>
+        <full_name>\Controller::register()</full_name>
+        <docblock line="128">
+          <description>Überprüft übergebenen Argumente auf Gültigkeit. Registriert User und erzeugt eine Challenge.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'username', 'password' und 'email' müssen gesetzt sein.&lt;/p&gt;&#10;" line="128" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall Array mit Challenge und neuer User ID, ansonsten Array mit Errornachricht." line="128" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="172" package="">
+        <name>checkString</name>
+        <full_name>\Controller::checkString()</full_name>
+        <docblock line="172">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$str</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$minLength</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$filter</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="187" package="">
+        <name>logout</name>
+        <full_name>\Controller::logout()</full_name>
+        <docblock line="187">
+          <description>Loggt den aktuellen User aus. Weiterleitung auf Login Seite.</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="196" package="">
+        <name>getOpenGames</name>
+        <full_name>\Controller::getOpenGames()</full_name>
+        <docblock line="196">
+          <description>Gibt offene Spiele zurück, d.h. nicht closed, mit einem Spieler und nicht vom Spieler selbst gestartet.</description>
+          <long-description></long-description>
+          <tag name="return" description="Array mit Spielinformationen" line="196" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="218" package="">
+        <name>createGame</name>
+        <full_name>\Controller::createGame()</full_name>
+        <docblock line="218">
+          <description>Erstellt ein Spiel mit den übergebenen Argumenten.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'name', 'player1color' und 'player2color' müssen gesetzt sein.&lt;/p&gt;&#10;" line="218" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall int mit neuer Spiel ID, ansonsten Array mit Errornachricht." line="218" type="integer|array">
+            <type>integer</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="258" package="">
+        <name>joinGame</name>
+        <full_name>\Controller::joinGame()</full_name>
+        <docblock line="258">
+          <description>Weist den aktuellen User zu einem Spiel zu,</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'gameid' muss gesetzt sein.&lt;/p&gt;&#10;" line="258" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="258" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="279" package="">
+        <name>getGameInfo</name>
+        <full_name>\Controller::getGameInfo()</full_name>
+        <docblock line="279">
+          <description>Gibt alle Informationen zum angegeben Spiel zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'gameid' muss gesetzt sein.&lt;/p&gt;&#10;" line="279" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall Array mit Infos, ansonsten Array mit Errornachricht." line="279" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="304" package="">
+        <name>getGameState</name>
+        <full_name>\Controller::getGameState()</full_name>
+        <docblock line="304">
+          <description>Gibt alle Spielzüge zum angegeben Spiel zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'gameid' muss gesetzt sein. Optional 'minid'.&lt;/p&gt;&#10;" line="304" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall Array mit Infos, ansonsten Array mit Errornachricht." line="304" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="340" package="">
+        <name>submitMove</name>
+        <full_name>\Controller::submitMove()</full_name>
+        <docblock line="340">
+          <description>Speichert einen Spielzug in der Datenbank.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'gameid' und 'x' (Spaltennummer) müssen gesetzt sein.&lt;/p&gt;&#10;" line="340" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall Array mit Spieldaten, ansonsten Array mit Errornachricht." line="340" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="394" package="">
+        <name>leaveGame</name>
+        <full_name>\Controller::leaveGame()</full_name>
+        <docblock line="394">
+          <description>Schließt das angegebene Spiel.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;'gameid' muss gesetzt sein.&lt;/p&gt;&#10;" line="394" type="array" variable="$args">
+            <type>array</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="394" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$args</name>
+          <default></default>
+          <type>array</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="410" package="">
+        <name>curPageName</name>
+        <full_name>\Controller::curPageName()</full_name>
+        <docblock line="410">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+    </class>
+    <source>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</source>
+  </file>
+  <file path="model.php" generated-path="model.html" hash="0242f9a2ae351b91366a45b2218cd02e" package="">
+    <docblock line="0">
+      <description></description>
+      <long-description></long-description>
+    </docblock>
+    <class final="false" abstract="false" namespace="" line="5" package="">
+      <extends/>
+      <name>Model</name>
+      <full_name>\Model</full_name>
+      <docblock line="5">
+        <description>Das Model tätigt alle Datenbankzugriffe und enthält ansonsten wenig Programmlogilk.</description>
+        <long-description></long-description>
+      </docblock>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="9" package="">
+        <name>__construct</name>
+        <full_name>\Model::__construct()</full_name>
+        <docblock line="9">
+          <description>Erstellt eine neue Modelinstanz und öffnet die Verbindung zur Datenbank.</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="21" package="">
+        <name>createUser</name>
+        <full_name>\Model::createUser()</full_name>
+        <docblock line="21">
+          <description>Fügt einen neuen User in der Datenbank ein.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;Benutzername&lt;/p&gt;" line="21" type="string" variable="$username">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Email Adresse&lt;/p&gt;" line="21" type="string" variable="$email">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Passwort&lt;/p&gt;" line="21" type="string" variable="$password">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall die neue Userid, ansonsten Array mit Errornachricht." line="21" type="integer|array">
+            <type>integer</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$username</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$email</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$password</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="47" package="">
+        <name>updateUser</name>
+        <full_name>\Model::updateUser()</full_name>
+        <docblock line="47">
+          <description>Ändert die Daten eines Users in der Datenbank.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des zu ändernden Users&lt;/p&gt;&#10;" line="47" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Benutzername, oder null fall keine Änderung erwünscht&lt;/p&gt;&#10;" line="47" type="null|string" variable="$username">
+            <type>null</type>
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Email Adresse, oder null fall keine Änderung erwünscht&lt;/p&gt;&#10;" line="47" type="null|string" variable="$email">
+            <type>null</type>
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Passwort, oder null fall keine Änderung erwünscht&lt;/p&gt;&#10;" line="47" type="null|string" variable="$password">
+            <type>null</type>
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;1 oder 0, oder null fall keine Änderung erwünscht&lt;/p&gt;&#10;" line="47" type="null|integer" variable="$activated">
+            <type>null</type>
+            <type>integer</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="47" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$username</name>
+          <default>null</default>
+          <type>null|string</type>
+        </argument>
+        <argument line="0">
+          <name>$email</name>
+          <default>null</default>
+          <type>null|string</type>
+        </argument>
+        <argument line="0">
+          <name>$password</name>
+          <default>null</default>
+          <type>null|string</type>
+        </argument>
+        <argument line="0">
+          <name>$activated</name>
+          <default>null</default>
+          <type>null|integer</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="74" package="">
+        <name>createChallenge</name>
+        <full_name>\Model::createChallenge()</full_name>
+        <docblock line="74">
+          <description>Generiert einen Challenge für einen User und fügt Sie in die Datenbank.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="74" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall challenge, ansonsten Array mit Errornachricht." line="74" type="string|array">
+            <type>string</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="94" package="">
+        <name>getChallenge</name>
+        <full_name>\Model::getChallenge()</full_name>
+        <docblock line="94">
+          <description>Holt challenge von einerm User aus der Datenbank.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="94" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="" line="94" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="112" package="">
+        <name>removeChallenge</name>
+        <full_name>\Model::removeChallenge()</full_name>
+        <docblock line="112">
+          <description>Löscht eine Challnege aus der Datenbank.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="112" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="112" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="126" package="">
+        <name>getUserByUsername</name>
+        <full_name>\Model::getUserByUsername()</full_name>
+        <docblock line="126">
+          <description>Sucht einen User anhand des Usernamens.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;Username des Users.&lt;/p&gt;" line="126" type="string" variable="$username">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="" line="126" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$username</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="144" package="">
+        <name>getUserByEmail</name>
+        <full_name>\Model::getUserByEmail()</full_name>
+        <docblock line="144">
+          <description>Sucht einen User anhand der Emailadresse.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;Email des Users.&lt;/p&gt;" line="144" type="string" variable="$email">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="" line="144" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$email</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="161" package="">
+        <name>getLoginUser</name>
+        <full_name>\Model::getLoginUser()</full_name>
+        <docblock line="161">
+          <description>Sucht einen User anhand der aktuellen Session.</description>
+          <long-description></long-description>
+          <tag name="return" description="" line="161" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="184" package="">
+        <name>createSession</name>
+        <full_name>\Model::createSession()</full_name>
+        <docblock line="184">
+          <description>Erstellt eine neue Session mit der angebenen Userid.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="184" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="191" package="">
+        <name>removeSession</name>
+        <full_name>\Model::removeSession()</full_name>
+        <docblock line="191">
+          <description>Löscht die aktuellen Sessioninformationen.</description>
+          <long-description></long-description>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="212" package="">
+        <name>createGame</name>
+        <full_name>\Model::createGame()</full_name>
+        <docblock line="212">
+          <description>Erstellt eine Spiel mit den angebenen Daten.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;Name des Spiels&lt;/p&gt;" line="212" type="string" variable="$name">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Maximale Anzahl der Spieler&lt;/p&gt;" line="212" type="int" variable="$maxPlayers">
+            <type>int</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Farbe des ersten Spielers.&lt;/p&gt;" line="212" type="string" variable="$p1color">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Farbe des zweiten Spielers.&lt;/p&gt;" line="212" type="string" variable="$p2color">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall id des neuen Spiels, ansonsten Array mit Errornachricht." line="212" type="integer|array">
+            <type>integer</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$name</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$maxPlayers</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+        <argument line="0">
+          <name>$p1color</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$p2color</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="233" package="">
+        <name>closeGame</name>
+        <full_name>\Model::closeGame()</full_name>
+        <docblock line="233">
+          <description>Setzt ein Spiel auf closed.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Spiels&lt;/p&gt;" line="233" type="int" variable="$gameid">
+            <type>int</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;ID des Gewinners oder null, falls kein Gewinner&lt;/p&gt;" line="233" type="int|null" variable="$winnderid">
+            <type>int</type>
+            <type>null</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="233" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+        <argument line="0">
+          <name>$winnerid</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="259" package="">
+        <name>getGames</name>
+        <full_name>\Model::getGames()</full_name>
+        <docblock line="259">
+          <description>Holt alle Spiele aus der Datenbank</description>
+          <long-description></long-description>
+          <tag name="return" description="" line="259" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="280" package="">
+        <name>getGame</name>
+        <full_name>\Model::getGame()</full_name>
+        <docblock line="280">
+          <description>Holt ein Spiel anhand der ID.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Spiels.&lt;/p&gt;" line="280" type="string" variable="$gameid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="" line="280" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="297" package="">
+        <name>getUsersForGame</name>
+        <full_name>\Model::getUsersForGame()</full_name>
+        <docblock line="297">
+          <description>Gibt alle User die an einem Spiel teilnehmen zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Spiels.&lt;/p&gt;" line="297" type="integer" variable="$gameid">
+            <type>integer</type>
+          </tag>
+          <tag name="return" description="" line="297" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>integer</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="320" package="">
+        <name>getGamesForUser</name>
+        <full_name>\Model::getGamesForUser()</full_name>
+        <docblock line="320">
+          <description>Gibt alle Spiele an denen der User teilnimmt zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="320" type="integer" variable="$userid">
+            <type>integer</type>
+          </tag>
+          <tag name="return" description="" line="320" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>integer</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="347" package="">
+        <name>assignUserToGame</name>
+        <full_name>\Model::assignUserToGame()</full_name>
+        <docblock line="347">
+          <description>Weist einem User ein Spiel zu.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="347" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;ID des Spiels.&lt;/p&gt;" line="347" type="string" variable="$gameid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall true, ansonsten Array mit Errornachricht." line="347" type="bool|array">
+            <type>bool</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="367" package="">
+        <name>getGameMoves</name>
+        <full_name>\Model::getGameMoves()</full_name>
+        <docblock line="367">
+          <description>Gibt alle Spielzüge eines Spiels zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="367" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;Min ID des Spielzugs.&lt;/p&gt;" line="367" type="integer" variable="$minId">
+            <type>integer</type>
+          </tag>
+          <tag name="return" description="" line="367" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$minId</name>
+          <default>0</default>
+          <type>integer</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="392" package="">
+        <name>getNumGameMoves</name>
+        <full_name>\Model::getNumGameMoves()</full_name>
+        <docblock line="392">
+          <description>Gibt die Anzahl an Spielzügen eines Users bei einem Spiel zurück.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Users.&lt;/p&gt;" line="392" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;ID des Spiels.&lt;/p&gt;" line="392" type="string" variable="$gameid">
+            <type>string</type>
+          </tag>
+          <tag name="return" description="" line="392" type="array">
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="415" package="">
+        <name>addMove</name>
+        <full_name>\Model::addMove()</full_name>
+        <docblock line="415">
+          <description>Erstellt einen Spielzug mit den angebenen Daten.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Spiels&lt;/p&gt;" line="415" type="string" variable="$gameid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;ID des Spielers&lt;/p&gt;" line="415" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;x Koordinate&lt;/p&gt;" line="415" type="int" variable="$x">
+            <type>int</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;y Koordinate&lt;/p&gt;" line="415" type="int" variable="$y">
+            <type>int</type>
+          </tag>
+          <tag name="return" description="Im Erfolgsfall id des neuen Spielzugs, ansonsten Array mit Errornachricht." line="415" type="integer|array">
+            <type>integer</type>
+            <type>array</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$x</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+        <argument line="0">
+          <name>$y</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="public" namespace="" line="438" package="">
+        <name>checkForWin</name>
+        <full_name>\Model::checkForWin()</full_name>
+        <docblock line="438">
+          <description>Überprüft ob Spieler mit letzem Zug gewonnen hat.</description>
+          <long-description></long-description>
+          <tag name="param" description="&lt;p&gt;ID des Spiels&lt;/p&gt;" line="438" type="string" variable="$gameid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;ID des Spielers&lt;/p&gt;" line="438" type="string" variable="$userid">
+            <type>string</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;x Koordinate&lt;/p&gt;" line="438" type="int" variable="$x">
+            <type>int</type>
+          </tag>
+          <tag name="param" description="&lt;p&gt;y Koordinate&lt;/p&gt;" line="438" type="int" variable="$y">
+            <type>int</type>
+          </tag>
+          <tag name="return" description="" line="438" type="bool">
+            <type>bool</type>
+          </tag>
+        </docblock>
+        <argument line="0">
+          <name>$gameid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$userid</name>
+          <default></default>
+          <type>string</type>
+        </argument>
+        <argument line="0">
+          <name>$x</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+        <argument line="0">
+          <name>$y</name>
+          <default></default>
+          <type>int</type>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="543" package="">
+        <name>error</name>
+        <full_name>\Model::error()</full_name>
+        <docblock line="543">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$message</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="547" package="">
+        <name>buildSelectQuery</name>
+        <full_name>\Model::buildSelectQuery()</full_name>
+        <docblock line="547">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$table</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$fields</name>
+          <default>null</default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$where</name>
+          <default>null</default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="572" package="">
+        <name>buildInsertQuery</name>
+        <full_name>\Model::buildInsertQuery()</full_name>
+        <docblock line="572">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$table</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$values</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="593" package="">
+        <name>buildUpdateQuery</name>
+        <full_name>\Model::buildUpdateQuery()</full_name>
+        <docblock line="593">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$table</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$values</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$where</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+      <method final="false" abstract="false" static="false" visibility="private" namespace="" line="613" package="">
+        <name>buildDeleteQuery</name>
+        <full_name>\Model::buildDeleteQuery()</full_name>
+        <docblock line="613">
+          <description></description>
+          <long-description></long-description>
+        </docblock>
+        <argument line="0">
+          <name>$table</name>
+          <default></default>
+          <type/>
+        </argument>
+        <argument line="0">
+          <name>$where</name>
+          <default></default>
+          <type/>
+        </argument>
+      </method>
+    </class>
+    <source>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</source>
+  </file>
+  <package name="global" full_name="global"/>
+  <namespace name="global" full_name="global"/>
+  <deprecated count="0"/>
+</project>
